@@ -437,6 +437,11 @@ function s5() {
   return tl;
 }
 
+// Make SVGs fill viewport (cover, not contain)
+document.querySelectorAll('#stage svg').forEach(function(svg) {
+  svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+});
+
 buildMaster();
 
 </script>
