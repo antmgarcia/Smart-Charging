@@ -7,32 +7,18 @@
 <meta name="description" content="GSAP-powered SVG animation loops. Self-contained, iframe-ready.">
 <style>
   :root {
-    --bg: #0b0b0d;
-    --bg-grad: radial-gradient(ellipse 80% 60% at 50% -10%, #1a1b24 0%, transparent 60%);
-    --surface: #111114;
-    --surface-2: #16161b;
-    --border: #1f1f26;
-    --border-strong: #2a2a33;
+    --bg: #2E3749;
+    --bg-grad: radial-gradient(ellipse 80% 60% at 50% -10%, #3b475e 0%, transparent 60%);
+    --surface: #252d3c;
+    --surface-2: #1f2633;
+    --border: #3a435a;
+    --border-strong: #4a556e;
     --text: #f4f4f6;
-    --text-muted: #8a8a95;
-    --text-dim: #5c5c66;
-    --accent: #6366f1;
-    --accent-glow: rgba(99, 102, 241, 0.15);
-    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 32px rgba(0,0,0,0.4);
-  }
-  [data-theme="light"] {
-    --bg: #fafafa;
-    --bg-grad: radial-gradient(ellipse 80% 60% at 50% -10%, #eef0ff 0%, transparent 60%);
-    --surface: #ffffff;
-    --surface-2: #f5f5f7;
-    --border: #e8e8ec;
-    --border-strong: #d4d4d8;
-    --text: #09090b;
-    --text-muted: #52525b;
-    --text-dim: #a1a1aa;
-    --accent: #4f46e5;
-    --accent-glow: rgba(79, 70, 229, 0.1);
-    --shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 32px rgba(0,0,0,0.06);
+    --text-muted: #a0a8b8;
+    --text-dim: #6b7489;
+    --accent: #7c8cff;
+    --accent-glow: rgba(124, 140, 255, 0.18);
+    --shadow: 0 1px 2px rgba(0,0,0,0.25), 0 12px 32px rgba(0,0,0,0.35);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -46,7 +32,6 @@
     color: var(--text);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    transition: background-color 0.3s, color 0.3s;
   }
 
   .wrap {
@@ -79,11 +64,10 @@
     background: var(--accent);
     box-shadow: 0 0 0 3px var(--accent-glow);
   }
-  .nav-right { display: flex; gap: 0.5rem; align-items: center; }
   .icon-btn {
     width: 36px;
     height: 36px;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     background: transparent;
@@ -92,6 +76,7 @@
     border-radius: 10px;
     cursor: pointer;
     transition: all 0.2s;
+    text-decoration: none;
   }
   .icon-btn:hover {
     border-color: var(--border-strong);
@@ -99,9 +84,6 @@
     background: var(--surface);
   }
   .icon-btn svg { width: 16px; height: 16px; }
-  .icon-btn .sun { display: none; }
-  [data-theme="light"] .icon-btn .sun { display: block; }
-  [data-theme="light"] .icon-btn .moon { display: none; }
 
   .hero {
     text-align: center;
@@ -136,7 +118,7 @@
   }
   h1 em {
     font-style: normal;
-    background: linear-gradient(135deg, var(--accent), #a855f7);
+    background: linear-gradient(135deg, var(--accent), #c084fc);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -174,7 +156,7 @@
     position: relative;
     width: 100%;
     aspect-ratio: 698 / 627;
-    background: var(--surface-2);
+    background: #2E3749;
     overflow: hidden;
     border-bottom: 1px solid var(--border);
   }
@@ -186,16 +168,9 @@
     border: 0;
     display: block;
   }
-  .preview::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
-  }
 
   .card-body {
-    padding: 1.5rem 1.5rem 1.5rem;
+    padding: 1.5rem;
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
@@ -235,6 +210,7 @@
     border-top: 1px solid var(--border);
   }
   .btn {
+    flex: 1;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -249,22 +225,24 @@
     transition: all 0.15s;
     white-space: nowrap;
   }
-  .btn-primary {
-    flex: 1;
-    background: var(--text);
-    color: var(--bg);
-  }
-  .btn-primary:hover { opacity: 0.9; }
-  .btn-ghost {
-    background: transparent;
-    border-color: var(--border);
+  .btn-dark {
+    background: #0e1320;
     color: var(--text);
+    border-color: #0e1320;
   }
-  .btn-ghost:hover {
-    border-color: var(--border-strong);
-    background: var(--surface-2);
+  .btn-dark:hover { background: #161c2e; border-color: #161c2e; }
+  .btn-light {
+    background: #f4f4f6;
+    color: #0e1320;
+    border-color: #f4f4f6;
   }
-  .btn svg { width: 14px; height: 14px; }
+  .btn-light:hover { background: #ffffff; border-color: #ffffff; }
+  .btn-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .btn-dark .btn-dot { background: var(--text-muted); }
+  .btn-light .btn-dot { background: #0e1320; }
 
   footer {
     margin-top: 6rem;
@@ -307,22 +285,11 @@
       <span class="brand-dot"></span>
       Alice Animations
     </a>
-    <div class="nav-right">
-      <a class="icon-btn" href="https://github.com/antmgarcia/alice-animations" target="_blank" rel="noopener" aria-label="View source on GitHub">
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.38 7.86 10.9.58.1.79-.25.79-.56v-1.96c-3.2.7-3.88-1.54-3.88-1.54-.52-1.33-1.27-1.68-1.27-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.24 3.33.95.1-.74.4-1.24.72-1.53-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.18-3.08-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.18 1.18a11.1 11.1 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.58.23 2.75.12 3.04.74.8 1.18 1.82 1.18 3.08 0 4.42-2.69 5.4-5.26 5.68.41.35.78 1.05.78 2.12v3.14c0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/>
-        </svg>
-      </a>
-      <button class="icon-btn" id="themeToggle" aria-label="Toggle theme">
-        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-        </svg>
-        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="4"/>
-          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
-        </svg>
-      </button>
-    </div>
+    <a class="icon-btn" href="https://github.com/antmgarcia/alice-animations" target="_blank" rel="noopener" aria-label="View source on GitHub">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.38 7.86 10.9.58.1.79-.25.79-.56v-1.96c-3.2.7-3.88-1.54-3.88-1.54-.52-1.33-1.27-1.68-1.27-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.24 3.33.95.1-.74.4-1.24.72-1.53-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.18-3.08-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.18 1.18a11.1 11.1 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.58.23 2.75.12 3.04.74.8 1.18 1.82 1.18 3.08 0 4.42-2.69 5.4-5.26 5.68.41.35.78 1.05.78 2.12v3.14c0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/>
+      </svg>
+    </a>
   </header>
 
   <section class="hero">
@@ -334,7 +301,7 @@
   <div class="grid">
     <article class="card">
       <div class="preview">
-        <iframe src="./SmartCharging/index-dark.html" title="Smart Charging preview" loading="lazy" id="previewCharging"></iframe>
+        <iframe src="./SmartCharging/index-dark.html" title="Smart Charging preview" loading="lazy"></iframe>
       </div>
       <div class="card-body">
         <div class="card-top">
@@ -343,18 +310,15 @@
         </div>
         <p>EV charging flows — status indicators, toggles, tilted cards, and usage analytics.</p>
         <div class="card-actions">
-          <a class="btn btn-primary" href="./SmartCharging/index-dark.html">
-            Open
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-          </a>
-          <a class="btn btn-ghost" href="./SmartCharging/index-light.html" aria-label="Open light variant">Light</a>
+          <a class="btn btn-dark" href="./SmartCharging/index-dark.html"><span class="btn-dot"></span>Dark</a>
+          <a class="btn btn-light" href="./SmartCharging/index-light.html"><span class="btn-dot"></span>Light</a>
         </div>
       </div>
     </article>
 
     <article class="card">
       <div class="preview">
-        <iframe src="./SmartThermo/index-dark.html" title="Smart Thermo preview" loading="lazy" id="previewThermo"></iframe>
+        <iframe src="./SmartThermo/index-dark.html" title="Smart Thermo preview" loading="lazy"></iframe>
       </div>
       <div class="card-body">
         <div class="card-top">
@@ -363,11 +327,8 @@
         </div>
         <p>Thermostat controls — charging state, animated ruler, schedules, and a friendly fox.</p>
         <div class="card-actions">
-          <a class="btn btn-primary" href="./SmartThermo/index-dark.html">
-            Open
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-          </a>
-          <a class="btn btn-ghost" href="./SmartThermo/index-light.html" aria-label="Open light variant">Light</a>
+          <a class="btn btn-dark" href="./SmartThermo/index-dark.html"><span class="btn-dot"></span>Dark</a>
+          <a class="btn btn-light" href="./SmartThermo/index-light.html"><span class="btn-dot"></span>Light</a>
         </div>
       </div>
     </article>
@@ -381,36 +342,5 @@
     </div>
   </footer>
 </div>
-
-<script>
-  (function() {
-    var toggle = document.getElementById('themeToggle');
-    var previewCharging = document.getElementById('previewCharging');
-    var previewThermo = document.getElementById('previewThermo');
-    var stored = localStorage.getItem('alice-theme');
-    var prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
-    var current = stored || (prefersLight ? 'light' : 'dark');
-
-    function apply(theme) {
-      if (theme === 'light') {
-        document.documentElement.setAttribute('data-theme', 'light');
-        previewCharging.src = './SmartCharging/index-light.html';
-        previewThermo.src = './SmartThermo/index-light.html';
-      } else {
-        document.documentElement.removeAttribute('data-theme');
-        previewCharging.src = './SmartCharging/index-dark.html';
-        previewThermo.src = './SmartThermo/index-dark.html';
-      }
-      localStorage.setItem('alice-theme', theme);
-    }
-
-    toggle.addEventListener('click', function() {
-      current = current === 'light' ? 'dark' : 'light';
-      apply(current);
-    });
-
-    apply(current);
-  })();
-</script>
 </body>
 </html>
