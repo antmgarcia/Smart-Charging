@@ -12,6 +12,14 @@ here = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(here, 'Suggestion_cards.svg')) as f:
     svg = f.read()
 
+# Clip the outer SVG to a shorter viewport so the iframe isn't abnormally tall
+# (the authored SVG is 388×911). Cards still animate through the window.
+VIEW_H = 420
+svg = svg.replace(
+    '<svg width="388" height="911" viewBox="0 0 388 911"',
+    f'<svg width="388" height="{VIEW_H}" viewBox="0 0 388 {VIEW_H}"',
+)
+
 with open(os.path.join(here, 'gsap.min.js')) as f:
     gsap = f.read()
 
@@ -84,7 +92,7 @@ html = f'''<!DOCTYPE html>
 *{{margin:0;padding:0;box-sizing:border-box}}
 html,body{{width:100%;height:100%;overflow:hidden;background:transparent}}
 body{{display:flex;justify-content:center;align-items:center}}
-#stage{{position:relative;width:100%;height:100%;max-width:388px;max-height:911px}}
+#stage{{position:relative;width:100%;height:100%;max-width:388px;max-height:{VIEW_H}px}}
 #stage svg{{width:100%;height:100%;display:block}}
 </style>
 </head>
