@@ -172,8 +172,7 @@ body{display:flex;justify-content:center;align-items:center}
   var svg = document.querySelector('#stage svg');
   if (!svg) return;
 
-  // Group each card (the <g clip-path> + following border <rect>) into a wrapper <g>
-  // so both move together under GSAP transforms.
+  // Group each card (the <g clip-path> + following border <rect>) into a wrapper <g>.
   var clipGroups = Array.prototype.slice.call(svg.querySelectorAll('g[clip-path]'));
   var cards = [];
   clipGroups.forEach(function(g, i) {
@@ -187,53 +186,72 @@ body{display:flex;justify-content:center;align-items:center}
     cards.push(wrapper);
   });
 
-  // Geometry: cards authored at y = 1.5 + i * 186, each 173 tall.
-  var CARD_X = 194;           // 388 / 2
+  // Geometry
+  var CARD_X = 194;
   var CARD_H = 173;
+  var CARD_STRIDE = 186;
   var CARD_TOPS = [1.5, 187.5, 373.5, 559.5, 745.5];
-  var CARD_CENTERS = CARD_TOPS.map(function(t) { return t + CARD_H / 2; });
 
-  // Pin rotation/scale origins to each card's own center so transforms feel local.
+  // Scale origins at each card's own center so the focal pulse feels local.
   cards.forEach(function(c, i) {
-    gsap.set(c, { svgOrigin: CARD_X + ' ' + CARD_CENTERS[i] });
+    gsap.set(c, { svgOrigin: CARD_X + ' ' + (CARD_TOPS[i] + CARD_H / 2) });
   });
 
-  var tl = gsap.timeline({ repeat: -1, repeatDelay: 0.2, defaults: { ease: 'power3.out' } });
+  // The viewport is 420 tall. "Focal" sits near the top of the visible window
+  // because card 0 enters there first. As the stack drifts upward, each card
+  // crosses this line and gets a subtle pulse — that's what lands *inside*
+  // the clipped frame, so that's where we spend the motion budget.
+  var FOCAL_Y = 90;
+  var DRIFT_END = -(5 * CARD_STRIDE);  // whole list past the top
+  var DRIFT_DURATION = 5.6;
 
-  // Reset each loop
-  tl.set(cards, { y: 220, x: -14, opacity: 0, scale: 0.86, rotation: function(i) { return i % 2 ? 2.5 : -2.5; } });
+  var tl = gsap.timeline({ repeat: -1 });
 
-  // 1. DEAL-IN — cards spring up from below with a diagonal sway that corrects
-  //    to level. back.out overshoot gives the stack real weight.
+  // Reset
+  tl.set(cards, { y: 120, opacity: 0, scale: 1 });
+
+  // 1. ENTRY — snappy expo.out, tight stagger. No rotation, no diagonal:
+  //    keep it clean so the composition reads instantly.
   tl.to(cards, {
-    y: 0, x: 0, opacity: 1, scale: 1, rotation: 0,
-    duration: 1.05,
-    stagger: { each: 0.085, from: 'start' },
-    ease: 'back.out(1.7)',
-  }, 0.05);
+    y: 0,
+    opacity: 1,
+    duration: 0.9,
+    stagger: 0.07,
+    ease: 'expo.out',
+  });
 
-  // 2. FOCAL SWEEP — a soft scale pulse travels top→bottom like a highlight
-  //    passing down the stack. Much livelier than a static hold.
-  tl.to(cards, {
-    scale: 1.045,
-    duration: 0.32,
-    stagger: { each: 0.11, from: 'start' },
-    ease: 'power2.out',
-    yoyo: true,
-    repeat: 1,
-  }, '+=0.35');
+  // 2. SETTLE — short breath before the list starts moving.
+  tl.to({}, { duration: 0.35 });
 
-  // 3. PARALLAX LIFT-OFF — stack drifts up and dissolves with wave-like stagger
-  //    and a faint rotation so motion feels loose rather than rigid.
+  // 3. DRIFT — whole list translates upward with a soft in/out ease
+  //    (the drift itself is the main visible event inside the clipped frame).
   tl.to(cards, {
-    y: function(i) { return -(CARD_TOPS[i] + CARD_H + 80); },
-    opacity: 0,
-    scale: 0.93,
-    rotation: function(i) { return i % 2 ? -1.8 : 1.8; },
-    duration: 1.25,
-    stagger: { each: 0.06, from: 'start' },
-    ease: 'power3.in',
-  }, '+=0.45');
+    y: '+=' + DRIFT_END,
+    duration: DRIFT_DURATION,
+    ease: 'power1.inOut',
+  }, 'drift+=0');
+
+  // 4. FOCAL PULSES — as each card crosses FOCAL_Y during the drift it gets a
+  //    brief scale-up + settle. Pulses are scheduled at the exact moment the
+  //    card's center reaches FOCAL_Y, so all the motion plays inside the clip.
+  cards.forEach(function(c, i) {
+    var startY = CARD_TOPS[i] + CARD_H / 2;       // where this card's center starts
+    var targetDelta = startY - FOCAL_Y;            // how far upward until it reaches focal
+    // Inverse of power1.inOut to find time: approximate with progress = delta / |DRIFT_END|
+    var progress = Math.min(1, Math.max(0, targetDelta / Math.abs(DRIFT_END)));
+    // power1.inOut approx inverse: t = 0.5 - 0.5*sqrt(1 - 2p) for p<=0.5, symmetrical above
+    var t = progress <= 0.5
+      ? 0.5 - 0.5 * Math.sqrt(Math.max(0, 1 - 2 * progress))
+      : 0.5 + 0.5 * Math.sqrt(Math.max(0, 2 * progress - 1));
+    var pulseAt = 'drift+=' + (t * DRIFT_DURATION);
+
+    tl.to(c, { scale: 1.055, duration: 0.32, ease: 'power2.out' }, pulseAt)
+      .to(c, { scale: 1, duration: 0.4, ease: 'power2.inOut' });
+  });
+
+  // 5. FADE / RESET — once the stack has cleared the visible area, gentle fade
+  //    to zero and the timeline restarts.
+  tl.to(cards, { opacity: 0, duration: 0.35, ease: 'power1.in' }, '>-0.1');
 })();
 
 </script>
