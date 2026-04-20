@@ -54,13 +54,7 @@ animation_js = r'''
     gsap.set(c, { svgOrigin: CARD_X + ' ' + (CARD_TOPS[i] + CARD_H / 2) });
   });
 
-  // Focal line — where the subtle scale pulse fires as each card crosses it
-  // during the drift. Roughly middle of the authored composition.
-  var FOCAL_Y = 455;
-  var DRIFT_END = -(5 * CARD_STRIDE);  // whole list past the top
-  var DRIFT_DURATION = 5.6;
-
-  var tl = gsap.timeline({ repeat: -1 });
+  var tl = gsap.timeline({ repeat: -1, repeatDelay: 0.4 });
 
   // Reset — cards start below and slightly askew for a hand-placed feel.
   tl.set(cards, {
@@ -80,38 +74,29 @@ animation_js = r'''
     ease: 'back.out(1.7)',
   }, 0.05);
 
-  // 2. SETTLE — short breath before the list starts moving.
-  tl.to({}, { duration: 0.35 });
-
-  // 3. DRIFT — whole list translates upward with a soft in/out ease
-  //    (the drift itself is the main visible event inside the clipped frame).
+  // 2. FOCAL SWEEP — a subtle scale wave passes through the stack. The pulse
+  //    is small (1.025) so no card's edge extends beyond its natural bounds.
   tl.to(cards, {
-    y: '+=' + DRIFT_END,
-    duration: DRIFT_DURATION,
-    ease: 'power1.inOut',
-  }, 'drift+=0');
+    scale: 1.025,
+    duration: 0.35,
+    stagger: { each: 0.12, from: 'start' },
+    ease: 'power2.out',
+    yoyo: true,
+    repeat: 1,
+  }, '+=0.4');
 
-  // 4. FOCAL PULSES — as each card crosses FOCAL_Y during the drift it gets a
-  //    brief scale-up + settle. Pulses are scheduled at the exact moment the
-  //    card's center reaches FOCAL_Y, so all the motion plays inside the clip.
-  cards.forEach(function(c, i) {
-    var startY = CARD_TOPS[i] + CARD_H / 2;       // where this card's center starts
-    var targetDelta = startY - FOCAL_Y;            // how far upward until it reaches focal
-    // Inverse of power1.inOut to find time: approximate with progress = delta / |DRIFT_END|
-    var progress = Math.min(1, Math.max(0, targetDelta / Math.abs(DRIFT_END)));
-    // power1.inOut approx inverse: t = 0.5 - 0.5*sqrt(1 - 2p) for p<=0.5, symmetrical above
-    var t = progress <= 0.5
-      ? 0.5 - 0.5 * Math.sqrt(Math.max(0, 1 - 2 * progress))
-      : 0.5 + 0.5 * Math.sqrt(Math.max(0, 2 * progress - 1));
-    var pulseAt = 'drift+=' + (t * DRIFT_DURATION);
+  // 3. SETTLE — a beat at rest before the loop fades.
+  tl.to({}, { duration: 0.8 });
 
-    tl.to(c, { scale: 1.055, duration: 0.32, ease: 'power2.out' }, pulseAt)
-      .to(c, { scale: 1, duration: 0.4, ease: 'power2.inOut' });
+  // 4. EXIT — gentle fade + tiny scale-down. Cards stay in place; no drift,
+  //    so nothing gets clipped mid-motion.
+  tl.to(cards, {
+    opacity: 0,
+    scale: 0.96,
+    duration: 0.55,
+    stagger: { each: 0.05, from: 'start' },
+    ease: 'power2.in',
   });
-
-  // 5. FADE / RESET — once the stack has cleared the visible area, gentle fade
-  //    to zero and the timeline restarts.
-  tl.to(cards, { opacity: 0, duration: 0.35, ease: 'power1.in' }, '>-0.1');
 })();
 '''
 
